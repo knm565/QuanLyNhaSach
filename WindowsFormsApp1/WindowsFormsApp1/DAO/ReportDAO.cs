@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 
 namespace WindowsFormsApp1.DAO
 {
@@ -19,16 +16,31 @@ namespace WindowsFormsApp1.DAO
 
         private ReportDAO() { }
 
-        public object see(int month)
+        public DataTable SeeMonthlyRevenue(int year, int month)
         {
-            string query = "select HoaDon.NgayInHoaDon as 'DateBill', Sum(HoaDon.TongTien) as 'TotalPrice' from HoaDon where HoaDon.NgayInHoaDon >= '2022-" + month + "-01' group by HoaDon.NgayInHoaDon";
+            string query = $"SELECT HoaDon.NgayInHoaDon AS 'DateBill', Sum(HoaDon.TongTien) AS 'TotalPrice' FROM HoaDon WHERE YEAR(HoaDon.NgayInHoaDon) = {year} AND MONTH(HoaDon.NgayInHoaDon) = {month} GROUP BY HoaDon.NgayInHoaDon";
             DataTable result = DataProvider.Instance.ExecuteQuery(query);
             return result;
         }
 
-        public DataTable excel(int month)
+        /*public DataTable SeeYearlyRevenue(int year)
         {
-            string query = "select HoaDon.NgayInHoaDon as 'DateBill', Sum(HoaDon.TongTien) as 'TotalPrice' from HoaDon where HoaDon.NgayInHoaDon >= '2022-" + month + "-01' group by HoaDon.NgayInHoaDon";
+            string query = $"SELECT MONTH(HoaDon.NgayInHoaDon) AS 'Month', Sum(HoaDon.TongTien) AS 'TotalPrice' FROM HoaDon WHERE YEAR(HoaDon.NgayInHoaDon) = {year} GROUP BY MONTH(HoaDon.NgayInHoaDon)";
+            DataTable result = DataProvider.Instance.ExecuteQuery(query);
+            return result;
+        }*/
+        public DataTable SeeYearlyRevenue(int year)
+        {
+            string query = $"SELECT MONTH(HoaDon.NgayInHoaDon) AS 'Month', Sum(HoaDon.TongTien) AS 'TotalPrice' FROM HoaDon WHERE YEAR(HoaDon.NgayInHoaDon) = {year} GROUP BY MONTH(HoaDon.NgayInHoaDon)";
+            DataTable result = DataProvider.Instance.ExecuteQuery(query);
+            return result;
+        }
+
+
+        public DataTable ExportToExcel(int year, int month)
+        {
+            string formattedMonth = month.ToString("00"); // Định dạng tháng thành "MM"
+            string query = $"SELECT CONVERT(varchar, HoaDon.NgayInHoaDon, 103) AS 'DateBill', Sum(HoaDon.TongTien) AS 'TotalPrice' FROM HoaDon WHERE YEAR(HoaDon.NgayInHoaDon) = {year} AND MONTH(HoaDon.NgayInHoaDon) = {month} GROUP BY CONVERT(varchar, HoaDon.NgayInHoaDon, 103)";
             DataTable result = DataProvider.Instance.ExecuteQuery(query);
             return result;
         }

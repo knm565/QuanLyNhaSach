@@ -17,17 +17,16 @@ create table TaiKhoan
 	SDT int,
 	NgaySinh date,
 	GioiTinh bit,
-
+	Visible bit,
 	ID int, 
 	FOREIGN KEY (ID) REFERENCES PhanQuyen(ID), 
 )
-ALTER TABLE Sach
-  ADD visible int;
+
 
 create table KhachHang
 (
 	IDKhachHang int IDENTITY(1,1) PRIMARY KEY,
-	TenKhachHang nvarchar(50),
+	TenKhachHang nvarchar(100),
 	SDT int,
 	Email nvarchar(50),
 	NgaySinh date,
@@ -35,8 +34,6 @@ create table KhachHang
 	CapBac nvarchar(50),
 	GioiTinh bit,
 )
-drop table ChiTietHoaDon
-drop table HoaDon
 
 create table HoaDon
 (
@@ -49,7 +46,7 @@ create table HoaDon
 	FOREIGN KEY (IDTaiKhoan) REFERENCES TaiKhoan(IDTaiKhoan),
 	FOREIGN KEY (IDKhachHang) REFERENCES KhachHang(IDKhachHang),
 )
-Insert into HoaDon(NgayInHoaDon,GioInHoaDon,IDTaiKhoan) values('2021/12/10','21:22:00',3)
+
 
 create table Sach
 (

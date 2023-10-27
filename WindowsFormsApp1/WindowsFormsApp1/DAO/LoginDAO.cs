@@ -56,7 +56,7 @@ namespace WindowsFormsApp1.DAO
             int id = int.Parse(result.Rows[0].ItemArray[0].ToString());
 
             string querySaveId = "update LuuID set IDStaff=" + id + " where IDChiTietHoaDon=1";
-            DataProvider.Instance.ExucuteNonQuery(querySaveId);
+            DataProvider.Instance.ExecuteNonQuery(querySaveId);
         }
     }
 }

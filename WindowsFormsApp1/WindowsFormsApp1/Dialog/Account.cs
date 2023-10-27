@@ -22,6 +22,12 @@ namespace WindowsFormsApp1.Dialog
         
 
         public string name, email, pass;
+
+        private void txtSDT_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
         private void Account_Load(object sender, EventArgs e)
         {
             if(idPhanLoai == 1)
@@ -65,5 +71,6 @@ namespace WindowsFormsApp1.Dialog
                 }
             }
         }
+
     }
 }

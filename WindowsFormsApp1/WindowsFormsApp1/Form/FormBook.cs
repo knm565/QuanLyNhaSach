@@ -82,6 +82,22 @@ namespace WindowsFormsApp1.FormDisplayManager
             
         }
 
+        private void dataGridViewBook_SelectionChanged(object sender, EventArgs e)
+        {
+                // Kiểm tra xem có ít nhất một hàng được chọn trong DataGridView
+            if (dataGridViewBook.SelectedRows.Count > 0)
+            {
+                btnUpdate.Enabled = true;
+                btnDelete.Enabled = true;
+            }
+            else
+            {
+                btnUpdate.Enabled = false;
+                btnDelete.Enabled = false;
+            }
+           
+        }
+
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             Book sua = new Book();

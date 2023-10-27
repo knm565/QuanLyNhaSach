@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.DAO;
+using WindowsFormsApp1.Dialog;
 
 namespace WindowsFormsApp1
 {
@@ -15,6 +16,8 @@ namespace WindowsFormsApp1
     {
         private int idBook;
         private string book;
+        private int createClickCount = 0;
+        private int checkClickCount = 0;
         public FormCreateBill()
         {
             InitializeComponent();
@@ -23,7 +26,7 @@ namespace WindowsFormsApp1
             btnThem.Enabled = false;
             btnXoa.Enabled = false;
             btnInBill.Enabled = false;
-            
+            btnHuy.Enabled = false;
         }
 
         private void FormCreateBill_Load(object sender, EventArgs e)
@@ -33,11 +36,6 @@ namespace WindowsFormsApp1
             dataGridViewBook.Columns[0].Width = 20;
             dataGridViewBook.ClearSelection();
 
-            cbbKhach.DataSource = CreateBillDAO.Instance.getKhach();
-            cbbKhach.DisplayMember = "TenKhachHang";
-            cbbKhach.ValueMember = "CapBac";
-
-            cbbKhach.Text = "Không Có";
 
             dataGridViewInfoBill.DataSource = CreateBillDAO.Instance.selectInfoBill(7);
             dataGridViewInfoBill.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
@@ -60,32 +58,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void cbbKhach_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if(cbbKhach.SelectedValue.ToString() == "Dong")
-            {
-                txtGiamGia.Text = "";
-            }else if(cbbKhach.SelectedValue.ToString() == "Bac")
-            {
-                txtGiamGia.Text = "5%";
-            }else if(cbbKhach.SelectedValue.ToString() == "Vang")
-            {
-                txtGiamGia.Text = "10%";
-            }else if(cbbKhach.SelectedValue.ToString() == "Kim Cuong")
-            {
-                txtGiamGia.Text = "15%";
-            }
-          
-        }
 
-        private void txtSoHoaDon_TextChanged(object sender, EventArgs e)
-        {
-            if (txtSoHoaDon.Text != "")
-            {
-                btnThem.Enabled = true;
-                btnXoa.Enabled = true;
-            }
-        }
 
         private void txtSoTienTra_TextChanged(object sender, EventArgs e)
         {
@@ -97,6 +70,7 @@ namespace WindowsFormsApp1
 
         private void btnTaoHoaDon_Click(object sender, EventArgs e)
         {
+            createClickCount = 1;
             string time = DateTime.Now.ToString("HH:mm:ss");
             string date = DateTime.Now.ToString("yyyy/MM/dd");
             CreateBillDAO.Instance.createBill(date, time, LoginDAO.Instance.getId());
@@ -107,6 +81,7 @@ namespace WindowsFormsApp1
             dataGridViewInfoBill.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewInfoBill.Columns[1].Width = 70;
             dataGridViewInfoBill.ClearSelection();
+            btnHuy.Enabled = true;
         }
 
         private void dataGridViewBook_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -117,10 +92,15 @@ namespace WindowsFormsApp1
                 {
                     DataGridViewRow row = this.dataGridViewBook.Rows[e.RowIndex];
                     idBook = int.Parse(row.Cells[0].Value.ToString());
-                    if(txtSoHoaDon.Text != "")
+                    if (txtSoHoaDon.Text != "")
                     {
                         btnThem.Enabled = true;
                     }
+                    
+                }
+                else
+                {
+                    btnThem.Enabled = false;
                 }
             }
             catch (Exception)
@@ -131,18 +111,34 @@ namespace WindowsFormsApp1
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            CreateBillDAO.Instance.addBook(int.Parse(txtSoHoaDon.Text), idBook);
-            btnThem.Enabled = false;
-            dataGridViewInfoBill.DataSource = CreateBillDAO.Instance.selectInfoBill(int.Parse(txtSoHoaDon.Text));
-            dataGridViewInfoBill.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewInfoBill.Columns[1].Width = 70;
-            dataGridViewInfoBill.ClearSelection();
-            txtSoTien.Text = CreateBillDAO.Instance.getMoney(int.Parse(txtSoHoaDon.Text)).ToString();
+            if (CreateBillDAO.Instance.checkTonKho(idBook)) 
+            {
+                CreateBillDAO.Instance.addBook(int.Parse(txtSoHoaDon.Text), idBook);
+                btnThem.Enabled = false;
+                dataGridViewInfoBill.DataSource = CreateBillDAO.Instance.selectInfoBill(int.Parse(txtSoHoaDon.Text));
+                dataGridViewInfoBill.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewInfoBill.Columns[1].Width = 70;
+                dataGridViewInfoBill.ClearSelection();
+                txtSoTien.Text = CreateBillDAO.Instance.getMoney(int.Parse(txtSoHoaDon.Text)).ToString();
+
+                dataGridViewBook.DataSource = CreateBillDAO.Instance.selectCreateBill();
+                dataGridViewBook.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewBook.Columns[0].Width = 20;
+                dataGridViewBook.ClearSelection();
+            }
+            else
+            { 
+                 DialogResult result = MessageBox.Show("Sách này đã hết tồn kho!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            }
+            
+
+
         }
 
         private void dataGridViewInfoBill_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            try
+            if (dataGridViewInfoBill.Rows.Count > 0)
             {
                 if (e.RowIndex >= 0)
                 {
@@ -150,12 +146,13 @@ namespace WindowsFormsApp1
                     book = row.Cells[0].Value.ToString();
                     btnXoa.Enabled = true;
                 }
-            }
-            catch (Exception)
-            {
-
+                else
+                {
+                    btnXoa.Enabled = false;
+                }
             }
         }
+
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
@@ -166,6 +163,12 @@ namespace WindowsFormsApp1
             dataGridViewInfoBill.Columns[1].Width = 70;
             dataGridViewInfoBill.ClearSelection();
             txtSoTien.Text = CreateBillDAO.Instance.getMoney(int.Parse(txtSoHoaDon.Text)).ToString();
+
+            dataGridViewBook.DataSource = CreateBillDAO.Instance.selectCreateBill();
+            dataGridViewBook.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewBook.Columns[0].Width = 20;
+            dataGridViewBook.ClearSelection();
+
         }
 
         private void txtSoTien_TextChanged(object sender, EventArgs e)
@@ -186,34 +189,40 @@ namespace WindowsFormsApp1
             {
                 txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 75 / 100).ToString();
             }
-           
+
         }
 
         private void txtGiamGia_TextChanged(object sender, EventArgs e)
         {
-            if (txtGiamGia.Text == "")
+            if (txtSoTienTra.Text != "") 
             {
-                txtSoTienTra.Text = txtSoTien.Text; ;
+                if (txtGiamGia.Text == "")
+                {
+                    txtSoTienTra.Text = txtSoTien.Text; ;
+                }
+                else if (txtGiamGia.Text == "5%")
+                {
+                    txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 95 / 100).ToString();
+                }
+                else if (txtGiamGia.Text == "10%")
+                {
+                    txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 90 / 100).ToString();
+                }
+                else if (txtGiamGia.Text == "15%")
+                {
+                    txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 85 / 100).ToString();
+                }
             }
-            else if (txtGiamGia.Text == "5%")
-            {
-                txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 90 / 100).ToString();
-            }
-            else if (txtGiamGia.Text == "10%")
-            {
-                txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 85 / 100).ToString();
-            }
-            else if (txtGiamGia.Text == "15%")
-            {
-                txtSoTienTra.Text = (int.Parse(txtSoTien.Text) * 75 / 100).ToString();
-            }
+            
         }
 
         private void btnInBill_Click(object sender, EventArgs e)
         {
-            CreateBillDAO.Instance.updateBill(cbbKhach.Text, int.Parse(txtSoHoaDon.Text), int.Parse(txtSoTienTra.Text));
-            CreateBillDAO.Instance.updateKho(int.Parse(txtSoHoaDon.Text));
-            cbbKhach.Text = "Không Có";
+            checkClickCount = 1;
+            CreateBillDAO.Instance.updateBill(txtName.Text, int.Parse(txtSoHoaDon.Text), int.Parse(txtSoTienTra.Text));
+            //CreateBillDAO.Instance.updateKho(int.Parse(txtSoHoaDon.Text));
+            txtName.Text = "";
+            txtName.Text = "";
             btnInBill.Enabled = false;
             btnThem.Enabled = false;
             btnXoa.Enabled = false;
@@ -226,6 +235,90 @@ namespace WindowsFormsApp1
             dataGridViewInfoBill.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewInfoBill.Columns[1].Width = 70;
             dataGridViewInfoBill.ClearSelection();
+            btnHuy.Enabled = false;
+            int selectedBillID = CreateBillDAO.Instance.getIdBill();
+            BillDetail billDetailForm = new BillDetail();
+            billDetailForm.DisplayBillDetails(selectedBillID);
+            billDetailForm.ShowDialog();
+        }
+        private void txtPhone_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+            // Kiểm tra nếu ký tự không phải là số hoặc không phải là các phím điều hướng (Arrow keys), Delete, hoặc Backspace
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back && e.KeyChar != (char)Keys.Delete && e.KeyChar != (char)Keys.Left && e.KeyChar != (char)Keys.Right)
+            {
+                // Từ chối ký tự nhập vào bằng cách loại bỏ nó khỏi bộ đệm
+                e.Handled = true;
+            }
+        }
+
+
+        private void txtPhone_TextChanged(object sender, EventArgs e)
+        {
+            string phoneNumber = txtPhone.Text;
+
+            // Kiểm tra nếu phoneNumber không rỗng
+            if (!string.IsNullOrEmpty(phoneNumber))
+            {
+                string customerInfo = CreateBillDAO.Instance.FindCustomerInfoByPhoneNumber(phoneNumber);
+                if (customerInfo != null)
+                {
+                    string[] infoParts = customerInfo.Split('|');
+                    txtName.Text = infoParts[0];
+                    txtCap.Text = infoParts[1];
+                }
+                else
+                {
+                    // Nếu không tìm thấy khách hàng, xóa dữ liệu cũ
+                    txtName.Text = "";
+                    txtCap.Text = "";
+                }
+                if (txtCap.Text == "Thành viên") txtGiamGia.Text = "5%";
+                else if (txtCap.Text == "Thành viên Thân thiết") txtGiamGia.Text = "10%";
+                else if (txtCap.Text == "VIP") txtGiamGia.Text = "15%";
+            }
+            else
+            {
+                // Xóa dữ liệu nếu phoneNumber rỗng
+                txtName.Text = "";
+                txtCap.Text = "";
+                txtGiamGia.Text = "";
+            }
+        }
+
+        private void FormCreateBill_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if ((txtSoHoaDon.Text != "") && (checkClickCount == 0))
+            {
+                DialogResult result = MessageBox.Show("Bạn chưa hoàn thành in hóa đơn! Bạn có chắc muốn đóng form này?", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (result == DialogResult.OK)
+                {
+                    CreateBillDAO.Instance.deleteBill(CreateBillDAO.Instance.getIdBill());
+                }
+            }
+        }
+
+        private void btnHuy_Click(object sender, EventArgs e)
+        {
+            if (txtSoHoaDon.Text != "" && checkClickCount == 0)
+            {
+                DialogResult result = MessageBox.Show("Bạn chưa hoàn thành in hóa đơn! Bạn có chắc muốn hủy bill này?", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (result == DialogResult.OK)
+                {
+                    CreateBillDAO.Instance.deleteBill(CreateBillDAO.Instance.getIdBill());
+                }
+                txtName.Text = "";
+                txtName.Text = "";
+                btnInBill.Enabled = false;
+                btnThem.Enabled = false;
+                btnXoa.Enabled = false;
+                btnTaoHoaDon.Enabled = true;
+                txtSoHoaDon.Text = "";
+                txtGiamGia.Text = "";
+                txtSoTien.Text = "";
+                txtSoTienTra.Text = "";
+            }
+            
         }
     }
 }

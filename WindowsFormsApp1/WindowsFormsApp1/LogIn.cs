@@ -18,14 +18,28 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
         }
+        private void textPhone_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
 
         private void btnLogIn_Click(object sender, EventArgs e)
         {
             string user = txtPhone.Text;
             string pass = txtPass.Text;
-            if (LoginManager(user, pass) == true || LoginStaff(user,pass) == true)
+
+            if (string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass))
             {
-                if(LoginManager(user,pass) == true)
+                MessageBox.Show("Không được để trống Số điện thoại và Mật khẩu", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Dừng hàm nếu có trường trống
+            }
+
+            if (LoginManager(user, pass) == true || LoginStaff(user, pass) == true)
+            {
+                if (LoginManager(user, pass) == true)
                 {
                     this.Hide();
                     DisplayManager manager = new DisplayManager();
@@ -38,12 +52,11 @@ namespace WindowsFormsApp1
                     DisplayStaff staff = new DisplayStaff();
                     staff.nameStaff = getName(user);
                     staff.ShowDialog();
-
                 }
             }
             else
             {
-                MessageBox.Show("Mật khẩu hoặc tài khoản sai!!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Mật khẩu hoặc tài khoản sai!!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

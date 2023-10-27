@@ -48,6 +48,22 @@ namespace WindowsFormsApp1.FormDisplayManager
             dataGridViewBook.ClearSelection();
         }
 
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+                if (string.IsNullOrEmpty(textBox1.Text))
+                {
+                    (dataGridViewBook.DataSource as DataTable).DefaultView.RowFilter = string.Empty;
+                    dataGridViewBook.ClearSelection();
+                }
+                else
+                {
+                    (dataGridViewBook.DataSource as DataTable).DefaultView.RowFilter = string.Format("TenTaiKhoan LIKE '{0}%'", textBox1.Text);
+                    dataGridViewBook.ClearSelection();
+                }
+            
+        }
+
         private void FormAccount_Load(object sender, EventArgs e)
         {
             dataGridViewBook.DataSource = AccountDAO.Instance.selectAccount();

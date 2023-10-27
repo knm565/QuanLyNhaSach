@@ -29,19 +29,37 @@ namespace WindowsFormsApp1.DAO
         public void add(string tenSach, string tenTacGia, string NXB, int soLuong,int Gia)
         {
             string query = "insert into Sach values(N'" + tenSach + "',N'" + NXB + "',N'" + tenTacGia + "'," + Gia + "," + soLuong + ",1)";
-            DataProvider.Instance.ExucuteNonQuery(query);
+            DataProvider.Instance.ExecuteNonQuery(query);
         }
 
         public void delete(int id)
         {
             string query = "update Sach set visible=0 where IDSach=" + id;
-            DataProvider.Instance.ExucuteNonQuery(query);
+            DataProvider.Instance.ExecuteNonQuery(query);
         }
         
         public void update(string tenSach, string tenTacGia, string NXB, int soLuong,int id,int Gia)
         {
-            string query = " update Sach set TenSach=N'" + tenSach + "', NXB=N'" + NXB + "', TenTacGia=N'" + tenTacGia + "', SoLuong=" + soLuong + ", Gia=" + Gia + " where IDSach=" + id;
-            DataProvider.Instance.ExucuteNonQuery(query);
+            string query = "update Sach set TenSach=N'" + tenSach + "', NXB=N'" + NXB + "', TenTacGia=N'" + tenTacGia + "', SoLuong=" + soLuong + ", Gia=" + Gia + " where IDSach=" + id;
+            DataProvider.Instance.ExecuteNonQuery(query);
+        }
+        public bool checkSach(string name, string author, string NXB)
+        {
+            string query = "SELECT * FROM Sach WHERE TenSach = N'" + name + "' and TenTacGia = N'" + author + "' and NXB = N'" + NXB + "';";
+            var result = DataProvider.Instance.ExecuteQuery(query);
+            if (result.Rows.Count > 0)
+                return true;
+            else
+                return false;
+        }
+        public void updateSL(string name, string author, string NXB, int sl)
+        {
+            string query1 = "select SoLuong from Sach where TenSach = N'" + name + "' and TenTacGia = N'" + author + "' and NXB = N'" + NXB + "';";
+            var rsl = DataProvider.Instance.ExecuteQuery(query1);
+            int soLuong = Convert.ToInt32(rsl.Rows[0]["SoLuong"]);
+            soLuong += sl;
+            string query = "update Sach set SoLuong=" + soLuong + " where TenSach = N'" + name + "' and TenTacGia = N'" + author + "' and NXB = N'" + NXB + "'";
+            DataProvider.Instance.ExecuteNonQuery(query);
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using WindowsFormsApp1.DAO;
 
 namespace WindowsFormsApp1.Dialog
@@ -23,7 +24,7 @@ namespace WindowsFormsApp1.Dialog
                 e.Handled = true;
             if (e.Handled)
             {
-                MessageBox.Show("Bạn phải nhâp số", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Bạn phải nhập số", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -39,8 +40,17 @@ namespace WindowsFormsApp1.Dialog
             {
                 if (txtTenSach.Text != "" && txtTacGia.Text != "" && txtNXB.Text != "" && txtSL.Text != "" && txtMoney.Text != "")
                 {
-                    BookDAO.Instance.add(txtTenSach.Text, txtTacGia.Text, txtNXB.Text, int.Parse(txtSL.Text), int.Parse(txtMoney.Text));
-                    this.Hide();
+                    if (BookDAO.Instance.checkSach(txtTenSach.Text, txtTacGia.Text, txtNXB.Text))
+                    {
+                        MessageBox.Show("Đã cập nhật số lượng "+ txtTenSach.Text+"!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        BookDAO.Instance.updateSL(txtTenSach.Text,txtTacGia.Text,txtNXB.Text,int.Parse(txtSL.Text));
+                        this.Hide();
+                    }
+                    else
+                    {
+                        BookDAO.Instance.add(txtTenSach.Text, txtTacGia.Text, txtNXB.Text, int.Parse(txtSL.Text), int.Parse(txtMoney.Text));
+                        this.Hide();
+                    }                   
                 }
                 else
                 {
@@ -68,7 +78,7 @@ namespace WindowsFormsApp1.Dialog
                 e.Handled = true;
             if (e.Handled)
             {
-                MessageBox.Show("Bạn phải nhâp số", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Bạn phải nhập số!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WindowsFormsApp1.DAO
 {
@@ -18,10 +14,9 @@ namespace WindowsFormsApp1.DAO
             private set { DataProvider.instance = value; }
         }
 
-
         private DataProvider() { }
 
-        private string connStr = "Data Source=DESKTOP-Q4GRQFB\\SQLEXPRESS;Initial Catalog=PTTKHDT;Integrated Security=True";
+        private string connStr = "Data Source=MSI\\SQLEXPRESS01;Initial Catalog=QuanLyNhaSach;Integrated Security=True";
 
         public DataTable ExecuteQuery(string query)
         {
@@ -42,7 +37,7 @@ namespace WindowsFormsApp1.DAO
             return data;
         }
 
-        public void ExucuteNonQuery(string query)
+        public void ExecuteNonQuery(string query)
         {
             SqlConnection conn = new SqlConnection(connStr);
 

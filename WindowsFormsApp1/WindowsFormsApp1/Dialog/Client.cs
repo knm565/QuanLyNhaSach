@@ -22,8 +22,16 @@ namespace WindowsFormsApp1.Dialog
             {
                 if (txtEmail.Text != "" && txtPhone.Text != "" && txtName.Text != "")
                 {
-                    ClientDAO.Instance.addClient(txtName.Text, txtEmail.Text, int.Parse(txtPhone.Text));
-                    this.Hide();
+                    if (ClientDAO.Instance.CheckClient(int.Parse(txtPhone.Text)))
+                    {
+                        MessageBox.Show("Khách hàng đã tồn tại!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        ClientDAO.Instance.addClient(txtName.Text, txtEmail.Text, int.Parse(txtPhone.Text));
+                        this.Hide();
+                    }
+                    
                 }
                 else
                 {
@@ -34,8 +42,14 @@ namespace WindowsFormsApp1.Dialog
             {
                 if (txtEmail.Text != "" && txtPhone.Text != "" && txtName.Text != "")
                 {
-                    ClientDAO.Instance.updateClient(int.Parse(txtID.Text),txtName.Text, txtEmail.Text, int.Parse(txtPhone.Text));
-                    this.Hide();
+                    if (ClientDAO.Instance.CheckClient(int.Parse(txtPhone.Text)))
+                    {
+                        MessageBox.Show("SDT đã tồn tại!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else {
+                        ClientDAO.Instance.updateClient(int.Parse(txtID.Text), txtName.Text, txtEmail.Text, int.Parse(txtPhone.Text));
+                        this.Hide();
+                    }                   
                 }
                 else
                 {
@@ -49,8 +63,8 @@ namespace WindowsFormsApp1.Dialog
         {
             if(idPhanLoai == 2)
             {
-                txtLevel.Text = "Đồng";
-                txtMoney.Text = "0";
+                txtLevel.Text = "";
+                txtMoney.Text = "";
                 btnClient.Text = "Thêm";
             }
             else
